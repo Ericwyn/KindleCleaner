@@ -1,7 +1,10 @@
 
+import java.awt.EventQueue;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+
+import javax.swing.JFrame;
 
 /**
  * 直接写一个小助手，清理kindle里面的残余文件
@@ -13,6 +16,16 @@ import java.util.Date;
 public class Main {
     private static Date date=new Date();
     public static void main(String [] args){
+//        EventQueue.invokeLater(new Runnable() {
+//            @Override
+//            public void run() {
+//                JFrame frame=new MainGUI();
+//                frame.setTitle("Kindel清理助手");
+//                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//                frame.setVisible(true);
+//            }
+//        });
+
         String path="/media";
         String kindlePath=findKindleDir(path);
         backupSDR(kindlePath);
