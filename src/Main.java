@@ -1,5 +1,7 @@
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * 直接写一个小助手，清理kindle里面的残余文件
@@ -9,17 +11,36 @@ import java.util.ArrayList;
  * Created by ericwyn on 17-4-2.
  */
 public class Main {
+    private static Date date=new Date();
     public static void main(String [] args){
-        String path="/media/ericwyn/Kindle/documents";
-        ArrayList<String> dirList=getDirList(path);
-        ArrayList<String> bookList=getBookList(path);
-        System.out.println("即将删除");
-        for(String str:dirList){
-            if(!bookList.contains(str)){
-                System.out.println(str);
+        String path="/media";
+        String kindlePath=findKindleDir(path);
+        backupSDR(kindlePath);
+        System.out.println("------------");
+        System.out.println("------------");
+        System.out.println("------------");
+        deleteSDR(kindlePath);
+    }
+
+    public static String findKindleDir(String pathFrom){
+        File file=new File(pathFrom);
+        File[] files=file.listFiles();
+        for(File fileFlag:files){
+            if(fileFlag.isDirectory()){
+                String absoultName=fileFlag.getAbsolutePath();
+                String nameLeve[]=absoultName.split("/");
+                if(nameLeve.length<=4){
+                    if(nameLeve[nameLeve.length-1].equals("Kindle")){
+                        return absoultName;
+                    }else {
+                        return findKindleDir(fileFlag.getAbsolutePath());
+                    }
+                }
             }
         }
+        return "null";
     }
+
 
     public static ArrayList<String> getBookList(String path){
         ArrayList<String> list=new ArrayList<>();
@@ -27,13 +48,20 @@ public class Main {
 
         File[] files=file.listFiles();
         for(File fileFlag:files){
-//            if(file.getName().matches("^(.*?)[.][j][a][v][a]$"))
             if(fileFlag.isFile()){
-                list.add(fileFlag.getName()
+                list.add(fileFlag.getName()         //过滤书籍文件名称
                         .replace(".mobi","")
+                        .replace(".MOBI","")
                         .replace(".azw3","")
+                        .replace(".AZW3","")
                         .replace(".azw","")
+                        .replace(".AZW","")
                         .replace(".txt","")
+                        .replace(".TXT","")
+                        .replace(".pdf","")
+                        .replace(".PDF","")
+                        .replace(".prc","")
+                        .replace(".PRC","")
                 );
             }
         }
@@ -54,5 +82,54 @@ public class Main {
         return list;
     }
 
+    public static int backupSDR(String kindlePath){
+        int backCode=0;
+        File backDir=new File(date.toString());
+        if(!backDir.isDirectory()){
+            backDir.mkdir();
+        }
+        String path=kindlePath+"/documents";
+        ArrayList<String> dirList=getDirList(path);
+        ArrayList<String> bookList=getBookList(path);
+        System.out.println("开始备份文件夹");
+        System.out.println("----------------------------");
+        for(String str:dirList){
+            if(!bookList.contains(str)){
+                String pathFrom=kindlePath+"/documents/"+str+".sdr";
+                String pathTo=date.toString()+"/"+str+".sdr";
+                System.out.println("来源目标："+pathFrom);
+                System.out.println("复制目标："+pathTo);
+                FileUtils.copyDie(pathFrom,pathTo);
+            }
+        }
+        return backCode;
+    }
+
+    public static int deleteSDR(String kindlePath){
+        int backCode=0;
+        Date date=new Date();
+        File backDir=new File(date.toString());
+        if(!backDir.isDirectory()){
+            backDir.mkdir();
+        }
+        String path=kindlePath+"/documents";
+        ArrayList<String> dirList=getDirList(path);
+        ArrayList<String> bookList=getBookList(path);
+        System.out.println("开始清理残余文件夹");
+        System.out.println("----------------------------");
+        for(String str:dirList){
+            if(!bookList.contains(str)){
+                String pathFrom=kindlePath+"/documents/"+str+".sdr";
+                System.out.println("开始删除："+pathFrom);
+                if(FileUtils.deleteDir(new File(pathFrom))){
+                    System.out.println("删除成功");
+                }else {
+                    System.out.println("删除失败");
+                }
+
+            }
+        }
+        return backCode;
+    }
 
 }
