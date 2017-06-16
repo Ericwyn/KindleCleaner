@@ -1,8 +1,11 @@
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 
 /**
@@ -10,6 +13,7 @@ import java.io.IOException;
  * Created by ericwyn on 17-4-2.
  */
 public class FileUtils {
+    private static Logger logger = Logger.getLogger(FileUtils.class);
     /**
      * 多层文件夹的复制
      * @param pathFrom  来源文件夹的路径
@@ -34,19 +38,19 @@ public class FileUtils {
                     while (bufferedInputStream.read(bytes)!=-1){
                         bufferedOutputStream.write(bytes);
                     }
-                    System.out.println("复制文件: "+fileFlag.getAbsolutePath()+"成功");
+                    logger.info("复制文件: "+fileFlag.getAbsolutePath()+"成功");
                     bufferedInputStream.close();
                     bufferedOutputStream.close();
                 }catch (IOException ioe){
-                    System.out.println("复制文件: "+fileFlag.getAbsolutePath()+"的时候出现了错误");
+                    logger.info("复制文件: "+fileFlag.getAbsolutePath()+"的时候出现了错误");
                     ioe.printStackTrace();
                 }
             }else if(fileFlag.isDirectory()){
                 String newDirName=pathTo+"/"+fileFlag.getName();
                 new File(newDirName).mkdir();
-                System.out.println("内层复制开始");
-                System.out.println(fileFlag.getAbsolutePath());
-                System.out.println(newDirName);
+                logger.info("内层复制开始");
+                logger.info(fileFlag.getAbsolutePath());
+                logger.info(newDirName);
                 copyDie(fileFlag.getAbsolutePath(),newDirName);
             }
         }

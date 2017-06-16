@@ -1,10 +1,8 @@
 
-import java.awt.EventQueue;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Date;
+import org.apache.log4j.Logger;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
 
 /**
  * 直接写一个小助手，清理kindle里面的残余文件
@@ -14,135 +12,21 @@ import javax.swing.JFrame;
  * Created by ericwyn on 17-4-2.
  */
 public class Main {
-    private static Date date=new Date();
-    public static void main(String [] args){
-//        EventQueue.invokeLater(new Runnable() {
-//            @Override
-//            public void run() {
-//                JFrame frame=new MainGUI();
-//                frame.setTitle("Kindel清理助手");
-//                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//                frame.setVisible(true);
-//            }
-//        });
+    private static Logger logger = Logger.getLogger(Main.class);
+
+    public static void main(String [] args) {
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
+        try {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+        }catch (Exception e){
+            logger.info(e.toString());
+        }
 
         String path="/media";
-        String kindlePath=findKindleDir(path);
-        backupSDR(kindlePath);
-        System.out.println("------------");
-        System.out.println("------------");
-        System.out.println("------------");
-        deleteSDR(kindlePath);
-    }
-
-    public static String findKindleDir(String pathFrom){
-        File file=new File(pathFrom);
-        File[] files=file.listFiles();
-        for(File fileFlag:files){
-            if(fileFlag.isDirectory()){
-                String absoultName=fileFlag.getAbsolutePath();
-                String nameLeve[]=absoultName.split("/");
-                if(nameLeve.length<=4){
-                    if(nameLeve[nameLeve.length-1].equals("Kindle")){
-                        return absoultName;
-                    }else {
-                        return findKindleDir(fileFlag.getAbsolutePath());
-                    }
-                }
-            }
-        }
-        return "null";
-    }
-
-
-    public static ArrayList<String> getBookList(String path){
-        ArrayList<String> list=new ArrayList<>();
-        File file=new File(path);
-
-        File[] files=file.listFiles();
-        for(File fileFlag:files){
-            if(fileFlag.isFile()){
-                list.add(fileFlag.getName()         //过滤书籍文件名称
-                        .replace(".mobi","")
-                        .replace(".MOBI","")
-                        .replace(".azw3","")
-                        .replace(".AZW3","")
-                        .replace(".azw","")
-                        .replace(".AZW","")
-                        .replace(".txt","")
-                        .replace(".TXT","")
-                        .replace(".pdf","")
-                        .replace(".PDF","")
-                        .replace(".prc","")
-                        .replace(".PRC","")
-                );
-            }
-        }
-        return list;
-    }
-
-    public static ArrayList<String> getDirList(String path){
-        ArrayList<String> list=new ArrayList<>();
-        File file=new File(path);
-        File[] files=file.listFiles();
-        for(File fileFlag:files){
-            if(fileFlag.isDirectory()){
-                if(fileFlag.getName().matches("^(.*?)[.][s][d][r]$")){
-                    list.add(fileFlag.getName().replace(".sdr",""));
-                }
-            }
-        }
-        return list;
-    }
-
-    public static int backupSDR(String kindlePath){
-        int backCode=0;
-        File backDir=new File(date.toString());
-        if(!backDir.isDirectory()){
-            backDir.mkdir();
-        }
-        String path=kindlePath+"/documents";
-        ArrayList<String> dirList=getDirList(path);
-        ArrayList<String> bookList=getBookList(path);
-        System.out.println("开始备份文件夹");
-        System.out.println("----------------------------");
-        for(String str:dirList){
-            if(!bookList.contains(str)){
-                String pathFrom=kindlePath+"/documents/"+str+".sdr";
-                String pathTo=date.toString()+"/"+str+".sdr";
-                System.out.println("来源目标："+pathFrom);
-                System.out.println("复制目标："+pathTo);
-                FileUtils.copyDie(pathFrom,pathTo);
-            }
-        }
-        return backCode;
-    }
-
-    public static int deleteSDR(String kindlePath){
-        int backCode=0;
-        Date date=new Date();
-        File backDir=new File(date.toString());
-        if(!backDir.isDirectory()){
-            backDir.mkdir();
-        }
-        String path=kindlePath+"/documents";
-        ArrayList<String> dirList=getDirList(path);
-        ArrayList<String> bookList=getBookList(path);
-        System.out.println("开始清理残余文件夹");
-        System.out.println("----------------------------");
-        for(String str:dirList){
-            if(!bookList.contains(str)){
-                String pathFrom=kindlePath+"/documents/"+str+".sdr";
-                System.out.println("开始删除："+pathFrom);
-                if(FileUtils.deleteDir(new File(pathFrom))){
-                    System.out.println("删除成功");
-                }else {
-                    System.out.println("删除失败");
-                }
-
-            }
-        }
-        return backCode;
+        String kindlePath=SfUtils.findKindleDir(path);
+        JFrame jFrame=new MainGUI(kindlePath);
+        jFrame.setVisible(true);
     }
 
 }
