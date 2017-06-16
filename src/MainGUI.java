@@ -22,10 +22,9 @@ import javax.swing.WindowConstants;
 public class MainGUI extends JFrame {
     private static Logger logger = Logger.getLogger(MainGUI.class);
     private static Font MY_FONT = loadFont("font/SourceHanSansK-Medium.ttf",18);
-    private static Font MY_FONT2 = loadFont("font/SourceHanSansK-Medium.ttf",14);
 
-    public static final int DEFAULT_WIDTH=800;
-    public static final int DEFAULT_HEIGHT=250;
+    private static final int DEFAULT_WIDTH=800;
+    private static final int DEFAULT_HEIGHT=250;
     private JPanel panel;
     private JLabel pathText;
     private JTextField pathWord;
@@ -119,9 +118,6 @@ public class MainGUI extends JFrame {
 
     }
 
-
-
-
     /**
      * 加载自定义字体，仅支持ttf
      * @param fontFileName 字体的名称
@@ -141,9 +137,32 @@ public class MainGUI extends JFrame {
         }
         catch(Exception e)//异常处理
         {
-            e.printStackTrace();
-            return new java.awt.Font("宋体", Font.PLAIN, 14);
+            logger.info("找不到字体，或者字体错误"+e.toString());
+            logger.info("请下载字体放置jar运行目录的font文件夹下，下载地址为：https://github.com/Ericwyn/KindleCleaner/raw/master/font/SourceHanSansK-Medium.ttf");
+            return new java.awt.Font("宋体", Font.BOLD, 16);
         }
     }
+
+    //失效的字体整合后读取方法，一个小坑
+//    private Font loadFont(String fontFileName, float fontSize) {
+//        try
+//        {
+//            File file = new File(fontFileName);
+//            URL resource = MainGUI.class.getClass().getResource("/font/SourceHanSansK-Medium.ttf");
+//            File fileFlag = new File(resource.toURI());
+//            FileInputStream aixing = new FileInputStream(fileFlag);
+//
+//            Font dynamicFont = Font.createFont(Font.TRUETYPE_FONT, aixing);
+//            Font dynamicFontPt = dynamicFont.deriveFont(fontSize);
+//            aixing.close();
+//
+//            return dynamicFontPt;
+//        }
+//        catch(Exception e)//异常处理
+//        {
+//            e.printStackTrace();
+//            return new java.awt.Font("宋体", Font.BOLD, 16);
+//        }
+//    }
 
 }
